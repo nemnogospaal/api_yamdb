@@ -11,6 +11,10 @@ class TitleSerializer(serializers.ModelSerializer):
         required=False,
         queryset=Category.objects.all()
     )
+    genre = serializers.PrimaryKeyRelatedField(
+        required=False,
+        queryset=Genre.objects.all()
+    )
 
     class Meta:
         fields = '__all__'
@@ -26,10 +30,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    title = serializers.PrimaryKeyRelatedField(
-        required=False,
-        queryset=Title.objects.all()
-    )
 
     class Meta:
         fields = '__all__'
