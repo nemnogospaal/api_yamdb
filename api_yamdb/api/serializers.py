@@ -7,12 +7,16 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'role',
-                  'bio', 'first_name', 'last_name')
+                  'bio', 'first_name', 'last_name', 'confirmation_code')
 
 
 class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     username = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('email', 'username')
 
     def validate(self, data):
         if data['username'] == 'me':
@@ -20,10 +24,6 @@ class SignUpSerializer(serializers.ModelSerializer):
                 'Невозможно использовать такой логин'
             )
         return data
-
-    class Meta:
-        model = User
-        fields = ('email', 'username')
 
 
 class GetTokenSerializer(serializers.ModelSerializer):
