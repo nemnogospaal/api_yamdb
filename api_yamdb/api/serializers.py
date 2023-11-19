@@ -50,7 +50,7 @@ class CommentSerializer(serializers.ModelField):
 
     class Meta:
         model = Comment
-        fields = ('_all__', )
+        fields = ('_all__',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -77,6 +77,12 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all()
     )
+
+    class Meta:
+        model = Title
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+        )
 
 
 class GetOnlyTitleSerializer(serializers.ModelSerializer):
