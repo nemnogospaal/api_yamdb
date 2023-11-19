@@ -1,15 +1,18 @@
 from django.core.mail import send_mail
+from django.db.models import Avg
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .permissions import IsAdmin, IsAdminModAuthorOrReading, IsAdminOrReading
 from reviews.models import User, Comment, Review
 
 from api.serializers import (GetTokenSerializer, SignUpSerializer,
                              UserSerializer, CommentSerializer,
-                             ReviewSerializer)
+                             ReviewSerializer, GenreSerializer,
+                             TitleSerializer, GetOnlyTitleSerializer)
 
 
 class ReviewViewSet(ModelViewSet):
@@ -72,3 +75,28 @@ class APIGetToken(APIView):
             {'confirmation_code': 'Неправильный код'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class CategoryViewSet(CreateListDestroyViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class GenreViewSet(CreateListDestroyViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all().annotate(
+        Avg('reviews__score')).order_by('name')
+    serializer_class = TitleSerializer
+    permission_classes = (IsAdminOrReading,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return GetOnlyTitleSerializer
+        return TitleSerializer
+
