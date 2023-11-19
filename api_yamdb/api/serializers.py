@@ -1,7 +1,7 @@
+import re
+
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
-from reviews.models import (User, Comment, Review,
-                            Genre, Title, Category)
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -9,12 +9,22 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'role',
-                  'bio', 'first_name', 'last_name', 'confirmation_code')
+                  'bio', 'first_name', 'last_name')
+
+    def validate(self, data):
+        username = data.get('username')
+        if re.search(r'^[\w.@+-]+\Z', str(username)) is None:
+            raise serializers.ValidationError(
+                'Недопустимые символы в логине'
+            )
+        return data
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
+    email = serializers.EmailField(max_length=254,
+                                   required=True)
+    username = serializers.CharField(max_length=150,
+                                     required=True)
 
     class Meta:
         model = User
@@ -25,6 +35,17 @@ class SignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Невозможно использовать такой логин'
             )
+        if User.objects.filter(username=data.get('username')):
+            raise serializers.ValidationError(
+                'Данный логин уже занят'
+            )
+        if User.objects.filter(email=data.get('email')):
+            raise serializers.ValidationError(
+                'Данный email уже занят'
+            )
+        username = data.get('username')
+        if re.search(r'^[\w.@+-]+\Z', str(username)) is None:
+            raise serializers.ValidationError('Недопустимые символы в логине')
         return data
 
 
@@ -37,6 +58,22 @@ class GetTokenSerializer(serializers.ModelSerializer):
         fields = ('username', 'confirmation_code')
 
 
+class UserPatchSerializer(serializers.ModelSerializer):
+    username = serializers.RegexField(
+        max_length=150,
+        regex=r'^[\w.@+-]+\Z',
+        required=True
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'role',
+            'bio', 'first_name', 'last_name'
+        )
+        read_only_fields = ('role',)
+
+
 class ReviewSerializer(serializers.ModelField):
     """Сериализатор модели отзывов."""
 
@@ -45,7 +82,7 @@ class ReviewSerializer(serializers.ModelField):
         fields = ('_all__', )
 
 
-class CommentSerializer(serializers.ModelField):
+class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор модели комментариев."""
 
     class Meta:
