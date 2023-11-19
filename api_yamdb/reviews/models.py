@@ -274,7 +274,7 @@ class Comment(models.Model):
         auto_now_add=True,
         verbose_name='Дата комментария'
     )
-    reviews = models.ForeignKey(
+    review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         verbose_name='Отзыв',

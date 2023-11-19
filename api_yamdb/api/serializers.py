@@ -37,20 +37,49 @@ class GetTokenSerializer(serializers.ModelSerializer):
         fields = ('username', 'confirmation_code')
 
 
-class ReviewSerializer(serializers.ModelField):
+class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор модели отзывов."""
+
+    author = serializers.StringRelatedField(
+        read_only=True
+    )
 
     class Meta:
         model = Review
-        fields = ('_all__', )
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+    def validate_score(self, value):
+        if 0 > value > 10:
+            raise serializers.ValidationError('Оценка по 10-бальной шкале!')
+        return value
+
+    def validate(self, data):
+        """Запрещает пользователям оставлять повторные отзывы."""
+        if not self.context.get('request').method == 'POST':
+            return data
+        author = self.context.get('request').user
+        title_id = self.context.get('view').kwargs.get('title_id')
+        if Review.objects.filter(author=author, title=title_id).exists():
+            raise serializers.ValidationError(
+                'Вы уже оставляли отзыв на это произведение'
+            )
+        return data
 
 
-class CommentSerializer(serializers.ModelField):
+class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор модели комментариев."""
+
+    author = serializers.StringRelatedField(
+        read_only=True
+    )
+    review = serializers.SlugRelatedField(
+        slug_field='text',
+        read_only=True
+    )
 
     class Meta:
         model = Comment
-        fields = ('_all__', )
+        fields = ('id', 'text', 'author', 'pub_date', 'review')
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -77,6 +106,12 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all()
     )
+
+    class Meta:
+        model = Title
+        fields = (
+            'id', 'name', 'year', 'description', 'genre', 'category'
+        )
 
 
 class GetOnlyTitleSerializer(serializers.ModelSerializer):
