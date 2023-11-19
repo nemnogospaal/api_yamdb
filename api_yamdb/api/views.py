@@ -5,9 +5,24 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from reviews.models import User
+from reviews.models import User, Comment, Review
 
-from .serializers import GetTokenSerializer, SignUpSerializer, UserSerializer
+from api.serializers import (GetTokenSerializer, SignUpSerializer, UserSerializer,
+                          CommentSerializer, ReviewSerializer)
+
+
+class ReviewViewSet(ModelViewSet):
+    """Вьюсет для отзывов."""
+
+    serializer_class = ReviewSerializer
+    queryset = Review.objects.all()
+
+
+class CommentViewSet(ModelViewSet):
+    """Вьюсет для комментариев."""
+
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
 
 
 class UserViewSet(ModelViewSet):

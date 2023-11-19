@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from reviews.models import User
+from reviews.models import User, Comment, Review
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -34,3 +34,19 @@ class GetTokenSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'confirmation_code')
+
+
+class ReviewSerializer(serializers.ModelField):
+    """Сериализатор модели отзывов."""
+
+    class Meta:
+        model = Review
+        fields = ('_all__', )
+
+
+class CommentSerializer(serializers.ModelField):
+    """Сериализатор модели комментариев."""
+
+    class Meta:
+        model = Comment
+        fields = ('_all__', )
