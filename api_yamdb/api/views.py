@@ -7,8 +7,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from reviews.models import User, Comment, Review
 
-from api.serializers import (GetTokenSerializer, SignUpSerializer, UserSerializer,
-                          CommentSerializer, ReviewSerializer)
+from api.serializers import (GetTokenSerializer, SignUpSerializer,
+                             UserSerializer, CommentSerializer,
+                             ReviewSerializer)
 
 
 class ReviewViewSet(ModelViewSet):
