@@ -178,6 +178,7 @@ class Title(models.Model):
         null=True
     )
 
+
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
@@ -287,3 +288,4 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Коментарии'
+

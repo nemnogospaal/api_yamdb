@@ -1,4 +1,4 @@
-import os
+import os, sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
+    'import_export',
     'reviews.apps.ReviewsConfig',
     'api.apps.ApiConfig',
 ]
@@ -103,10 +104,12 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+STATIC_ROOT = 'staticfiles/' # Here
+STATICFILES_DIRS = [
+    BASE_DIR / 'static/'
+]
 
 AUTH_USER_MODEL = 'reviews.User'
 

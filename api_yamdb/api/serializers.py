@@ -37,7 +37,7 @@ class GetTokenSerializer(serializers.ModelSerializer):
         fields = ('username', 'confirmation_code')
 
 
-class ReviewSerializer(serializers.ModelField):
+class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор модели отзывов."""
 
     class Meta:
@@ -45,7 +45,7 @@ class ReviewSerializer(serializers.ModelField):
         fields = ('_all__', )
 
 
-class CommentSerializer(serializers.ModelField):
+class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор модели комментариев."""
 
     class Meta:
@@ -81,20 +81,16 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'description', 'genre', 'category'
         )
 
 
 class GetOnlyTitleSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
-    rating = serializers.IntegerField(
-        source='reviews__score__avg',
-        read_only=True
-    )
 
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'description', 'genre', 'category'
         )
