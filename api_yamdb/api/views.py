@@ -1,18 +1,23 @@
 from django.core.mail import send_mail
 from django.db.models import Avg
-from rest_framework import permissions, status
+from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
+from django_filters.rest_framework import DjangoFilterBackend
 
+from .mixins import CreateListDestroyViewSet
+from .filters import TitleFilter
 from .permissions import IsAdmin, IsAdminModAuthorOrReading, IsAdminOrReading
-from reviews.models import User, Comment, Review
+from reviews.models import (User, Comment, Review,
+                            Category, Genre, Title)
 
 from api.serializers import (GetTokenSerializer, SignUpSerializer,
                              UserSerializer, CommentSerializer,
                              ReviewSerializer, GenreSerializer,
-                             TitleSerializer, GetOnlyTitleSerializer)
+                             TitleSerializer, GetOnlyTitleSerializer,
+                             CategorySerializer)
 
 
 class ReviewViewSet(ModelViewSet):
