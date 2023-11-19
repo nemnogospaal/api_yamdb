@@ -16,6 +16,7 @@ ROLE_CHOICES = [
 
 TEXT_LOMIT = 30
 
+
 class User(AbstractUser):
     """Модель пользователя."""
 
@@ -80,6 +81,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
 
 class Category(models.Model):
     """Класс категорий."""
