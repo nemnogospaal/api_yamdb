@@ -10,7 +10,7 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('text', 'author', 'raiting')
+    list_display = ('text', 'author', 'score')
 
 
 @admin.register(Raiting)
