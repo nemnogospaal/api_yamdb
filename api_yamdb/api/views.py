@@ -119,6 +119,7 @@ class UserViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def signup(request):
@@ -127,6 +128,7 @@ def signup(request):
     data = serializer.validated_data
     email = data.get('email')
     username = data.get('username')
+    #СДЕЛАТЬ ПРОВЕРКУ НА ПОВТОРЕНИЕ ПОЧТЫ!!!
     user, _ = User.objects.get_or_create(username=username, email=email)
     confirmation_code = default_token_generator.make_token(user)
     user.save()
@@ -135,7 +137,7 @@ def signup(request):
                 message=f'Код подтверждения - {confirmation_code}',
                 from_email='YaMDB@mail.com',
                 recipient_list=(user.email,),
-                fail_silently=False
+               fail_silently=False
     )
     return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -1,6 +1,8 @@
 import re
 
+from django.db import IntegrityError
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
@@ -20,14 +22,14 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
 
-class SignUpSerializer(serializers.Serializer):
+class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=254,
                                    required=True)
-    username = serializers.CharField(max_length=150,
-                                     required=True)
+    username = serializers.CharField(max_length=150)
 
     class Meta:
         model = User
+        lookup_field = 'username'
         fields = ('email', 'username')
 
     def validate(self, data):
@@ -35,15 +37,14 @@ class SignUpSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 'Невозможно использовать такой логин'
             )
-        if User.objects.filter(username=data.get('username')):
-            raise serializers.ValidationError(
-                'Данный логин уже занят'
-            )
-        if User.objects.filter(email=data.get('email')):
-            raise serializers.ValidationError(
-                'Данный email уже занят'
-            )
         username = data.get('username')
+        email = data.get('email')
+        #try:
+        #    user, _ = User.objects.get_or_create(username=username,
+        #                                         email=email)
+        #except IntegrityError:
+        #    raise serializers.ValidationError('Этот логин или email уже занят')
+            
         if re.search(r'^[\w.@+-]+\Z', str(username)) is None:
             raise serializers.ValidationError('Недопустимые символы в логине')
         return data
