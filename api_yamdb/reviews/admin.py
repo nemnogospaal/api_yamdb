@@ -5,7 +5,7 @@ from reviews.models import Comment, Review, User
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('text', 'author', 'reviews')
+    list_display = ('text', 'author', 'review')
 
 
 @admin.register(Review)

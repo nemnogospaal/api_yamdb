@@ -12,7 +12,8 @@ class IsAdminModAuthorOrReading(permissions.BasePermission):
         return (
             obj.author == request.user
             or request.method in permissions.SAFE_METHODS
-            or request.user.is_moderator_or_admin
+            or request.user.is_moderator
+            or request.user.is_admin
         )
 
 
