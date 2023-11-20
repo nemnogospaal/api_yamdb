@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
 
-class SignUpSerializer(serializers.ModelSerializer):
+class SignUpSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=254,
                                    required=True)
     username = serializers.CharField(max_length=150,
@@ -49,7 +49,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         return data
 
 
-class GetTokenSerializer(serializers.ModelSerializer):
+class GetTokenSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 

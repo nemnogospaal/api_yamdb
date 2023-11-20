@@ -82,7 +82,7 @@ class APISignup(APIView):
             data = serializer.validated_data
             username = data.get('username')
             email = data.get('email')
-            user = User.objects.create(
+            user, _ = User.objects.get_or_create(
                 username=username,
                 email=email
             )
