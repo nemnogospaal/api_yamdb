@@ -89,9 +89,9 @@ class UserResource(resources.ModelResource):
     class Meta:
         model = User
 
-@admin.register(User)
-class UserAdmin(ImportExportModelAdmin):
-    resource_classes = [UserResource]
+#@admin.register(User)
+#class UserAdmin(ImportExportModelAdmin):
+#    resource_classes = [UserResource]
 
 
 
