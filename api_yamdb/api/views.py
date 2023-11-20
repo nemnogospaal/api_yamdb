@@ -18,7 +18,7 @@ from reviews.models import Category, Comment, Genre, Review, Title, User
 
 from .filters import TitleFilter
 from .mixins import CreateListDestroyViewSet
-from .permissions import IsAdmin, IsAdminOrReading
+from .permissions import IsAdmin, IsAdminOrReading, IsAdminModAuthorOrReading
 
 
 class ReviewViewSet(ModelViewSet):
