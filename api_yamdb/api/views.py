@@ -9,7 +9,7 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -85,14 +85,15 @@ class UserViewSet(ModelViewSet):
     """Вьюсет для пользователя."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated, IsAdmin,)
+    permission_classes = (permissions.IsAuthenticated,
+                          IsAdmin,)
     filter_backends = (filters.SearchFilter,)
     search_field = ('username',)
     lookup_field = 'username'
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(
-        methods=['get', 'patch'],
+        methods=['GET', 'PATCH'],
         detail=False,
         permission_classes=(permissions.IsAuthenticated,),
         url_path='me'
@@ -118,33 +119,52 @@ class UserViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-
-class APISignup(APIView):
-    """Регистрация пользователя."""
-    permission_classes = (permissions.AllowAny,)
-
-    def post(self, request):
-        serializer = SignUpSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            data = serializer.validated_data
-            username = data.get('username')
-            email = data.get('email')
-            user, _ = User.objects.get_or_create(
-                username=username,
-                email=email
-            )
-            confirmation_code = default_token_generator.make_token(user)
-            send_mail(
-                subject='YaMDB - Код подтверждения',
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def signup(request):
+    serializer = SignUpSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    data = serializer.validated_data
+    email = data.get('email')
+    username = data.get('username')
+    user, _ = User.objects.get_or_create(username=username, email=email)
+    confirmation_code = default_token_generator.make_token(user)
+    user.save()
+    send_mail(
+        subject='YaMDB - Код подтверждения',
                 message=f'Код подтверждения - {confirmation_code}',
                 from_email='YaMDB@mail.com',
                 recipient_list=(user.email,),
                 fail_silently=False
-            )
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+    )
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+#class APISignup(APIView):
+#    """Регистрация пользователя."""
+#    permission_classes = (permissions.AllowAny,)
+
+#    def post(self, request):
+#        serializer = SignUpSerializer(data=request.data)
+#        if serializer.is_valid(raise_exception=True):
+#            data = serializer.validated_data
+#            username = data.get('username')
+#            email = data.get('email')
+#            user, _ = User.objects.get_or_create(
+#                username=username,
+#                email=email
+#            )
+#            confirmation_code = default_token_generator.make_token(user)
+#            send_mail(
+#                subject='YaMDB - Код подтверждения',
+#                message=f'Код подтверждения - {confirmation_code}',
+#                from_email='YaMDB@mail.com',
+#                recipient_list=(user.email,),
+#               fail_silently=False
+#            )
+#            return Response(serializer.data, status=status.HTTP_200_OK)
+#        else:
+#            return Response(serializer.errors,
+#                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class APIGetToken(APIView):

@@ -50,7 +50,7 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class GetTokenSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
+    username = serializers.CharField(max_length=150, required=True)
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:

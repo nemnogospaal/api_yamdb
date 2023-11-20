@@ -1,4 +1,4 @@
-from api.views import (APIGetToken, APISignup, CategoryViewSet, CommentViewSet,
+from api.views import (APIGetToken, signup, CategoryViewSet, CommentViewSet,
                        GenreViewSet, ReviewViewSet, TitleViewSet, UserViewSet)
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
@@ -28,6 +28,6 @@ router.register(
 
 urlpatterns = [
     path('v1/', include(router.urls)),
-    path('v1/auth/signup/', APISignup.as_view(), name='signup'),
+    path('v1/auth/signup/', signup, name='signup'),
     path('v1/auth/token/', APIGetToken.as_view(), name='token')
 ]
