@@ -192,3 +192,11 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.request.method == 'GET':
             return GetOnlyTitleSerializer
         return TitleSerializer
+    
+    def update(self, request, *args, **kwargs):
+        if request.method == 'PUT':
+            return Response(
+                {'detail': 'Method Not Allowed'},
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+        return super().update(request, *args, **kwargs)

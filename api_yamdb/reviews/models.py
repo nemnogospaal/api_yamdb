@@ -179,6 +179,7 @@ class Title(models.Model):
         null=True
     )
 
+
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'

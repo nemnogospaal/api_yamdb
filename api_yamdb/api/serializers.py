@@ -154,13 +154,9 @@ class TitleSerializer(serializers.ModelSerializer):
 class GetOnlyTitleSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
-    rating = serializers.IntegerField(
-        source='reviews__score__avg',
-        read_only=True
-    )
 
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'description', 'genre', 'category'
         )
