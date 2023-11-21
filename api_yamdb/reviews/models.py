@@ -26,7 +26,8 @@ class User(AbstractUser):
         verbose_name='имя пользователя',
         unique=True,
         blank=False,
-        null=False
+        null=False,
+        validators=([RegexValidator(regex=r'^[\w.@+-]+\Z')])
     )
     email = models.EmailField(
         max_length=254,
@@ -74,7 +75,10 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == ADMIN
+        return (self.role == ADMIN
+                or self.is_staff
+                or self.is_superuser
+        )
 
     class Meta:
         verbose_name = 'Пользователь'

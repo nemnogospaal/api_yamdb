@@ -5,10 +5,12 @@ from api.serializers import (CategorySerializer, CommentSerializer,
                              UserPatchSerializer, UserSerializer)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
+from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -87,7 +89,7 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (permissions.IsAuthenticated,
                           IsAdmin,)
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend)
     search_field = ('username',)
     lookup_field = 'username'
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -107,6 +109,7 @@ class UserViewSet(ModelViewSet):
                 partial=True
             )
             serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == 'PATCH':
             serializer = UserPatchSerializer(
@@ -128,18 +131,33 @@ def signup(request):
     data = serializer.validated_data
     email = data.get('email')
     username = data.get('username')
-    #СДЕЛАТЬ ПРОВЕРКУ НА ПОВТОРЕНИЕ ПОЧТЫ!!!
-    user, _ = User.objects.get_or_create(username=username, email=email)
+
+    try:
+        user, _ = User.objects.get_or_create(email=email,
+                                             username=username)
+    except IntegrityError:
+        raise ValidationError('Данный логин или email уже занят')
     confirmation_code = default_token_generator.make_token(user)
-    user.save()
     send_mail(
         subject='YaMDB - Код подтверждения',
                 message=f'Код подтверждения - {confirmation_code}',
                 from_email='YaMDB@mail.com',
                 recipient_list=(user.email,),
-               fail_silently=False
+                fail_silently=False
     )
     return Response(serializer.data, status=status.HTTP_200_OK)
+    #СДЕЛАТЬ ПРОВЕРКУ НА ПОВТОРЕНИЕ ПОЧТЫ!!!
+    #user, _ = User.objects.get_or_create(username=username, email=email)
+    #confirmation_code = default_token_generator.make_token(user)
+    #user.save()
+    #send_mail(
+    #    subject='YaMDB - Код подтверждения',
+    #            message=f'Код подтверждения - {confirmation_code}',
+    #            from_email='YaMDB@mail.com',
+    #            recipient_list=(user.email,),
+    #           fail_silently=False
+    #)
+    #return Response(serializer.data, status=status.HTTP_200_OK)
 
 #class APISignup(APIView):
 #    """Регистрация пользователя."""
