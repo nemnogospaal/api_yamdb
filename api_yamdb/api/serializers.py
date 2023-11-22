@@ -2,6 +2,7 @@ import re
 
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title, User
+from api.validators import username_me_validator, username_validator
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,38 +25,33 @@ class SignUpSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=254,
                                    required=True)
     username = serializers.CharField(max_length=150,
-                                     required=True)
-
-    class Meta:
-        model = User
-        fields = ('email', 'username')
+                                     required=True,
+                                     validators=[username_validator,
+                                                 username_me_validator])
 
     def validate(self, data):
-        if data['username'] == 'me':
-            raise serializers.ValidationError(
-                'Невозможно использовать такой логин'
-            )
-        if User.objects.filter(username=data.get('username')):
-            raise serializers.ValidationError(
-                'Данный логин уже занят'
-            )
-        if User.objects.filter(email=data.get('email')):
-            raise serializers.ValidationError(
-                'Данный email уже занят'
-            )
         username = data.get('username')
-        if re.search(r'^[\w.@+-]+\Z', str(username)) is None:
-            raise serializers.ValidationError('Недопустимые символы в логине')
+        #email = data.get('email')
+        if not User.objects.filter(
+            username=(data.get('username')), email=(data.get('email'))
+        ).exists():
+            if User.objects.filter(username=(data.get('username'))):
+                raise serializers.ValidationError('Данный username уже занят')
+            if User.objects.filter(email=data.get('email')):
+                raise serializers.ValidationError('Данный email уже занят')
+            if re.search(r'^[\w.@+-]+\Z', str(username)) is None:
+                raise serializers.ValidationError(
+                    'Недопустимые символы в логине')
         return data
 
 
 class GetTokenSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150, required=True)
-    confirmation_code = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = ('username', 'confirmation_code')
+    username = serializers.CharField(max_length=150,
+                                     required=True,
+                                     validators=[username_validator,
+                                                 username_me_validator])
+    confirmation_code = serializers.CharField(required=True,
+                                              max_length=254)
 
 
 class UserPatchSerializer(serializers.ModelSerializer):

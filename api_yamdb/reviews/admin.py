@@ -5,14 +5,14 @@ from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
 
-class CommentResource(resources.ModelResource):
+#class CommentResource(resources.ModelResource):
 
-    class Meta:
-        model = Comment
+#    class Meta:
+#        model = Comment
 
-@admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
-    list_display = ('text', 'author', 'reviews')
+#@admin.register(Comment)
+#class CommentAdmin(admin.ModelAdmin):
+#    list_display = ('text', 'author', 'reviews')
 
 
 class ReviewResource(resources.ModelResource):
