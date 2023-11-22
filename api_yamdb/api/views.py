@@ -2,6 +2,7 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status, viewsets
+from rest_framework.serializers import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -56,22 +57,27 @@ class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (IsAdminModAuthorOrReading, )
 
-    def get_review(self):
-        review_id = self.kwargs.get('review_id')
-        return get_object_or_404(Review, pk=review_id)
-
     def get_queryset(self):
-        return self.get_review().comments.all()
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'),
+            title__id=self.kwargs.get('title_id'))
+        return review.comments.all()
 
     def perform_create(self, serializer):
-        if serializer.is_valid():
+        review = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'),
+            title__id=self.kwargs.get('title_id'))
+        serializer.is_valid(raise_exception=True)
+
+        try:
             serializer.save(
                 author=self.request.user,
-                review=self.get_review()
+                review=review
             )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':
