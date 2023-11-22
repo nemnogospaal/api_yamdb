@@ -90,18 +90,6 @@ class UserViewSet(ModelViewSet):
                           IsAdmin,)
 
 
-def send_confirmation_code(user: User):
-    confirmation_code = default_token_generator.make_token(user)
-    send_mail(
-        subject='YaMDB - Код подтверждения',
-        message=f'Код подтверждения - {confirmation_code}',
-        from_email='YaMDB@mail.com',
-        recipient_list=(user.email,),
-        fail_silently=False
-    )
-    
-
-    
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def signup(request):
@@ -109,51 +97,22 @@ def signup(request):
     serializer.is_valid(raise_exception=True)
     email = serializer.data['email']
     username = serializer.data['username']
-    try:
-        user, _ = User.objects.get_or_create(
-            username=serializer.validated_data['username'],
-            email=serializer.validated_data['email'])
-    except IntegrityError:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #confirmation_code = default_token_generator.make_token(user)
-    user.confirmation_code = send_confirmation_code(user)
+    #try:
+    user, _ = User.objects.get_or_create(
+        username=username,
+        email=email)
+    #except IntegrityError:
+    #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    confirmation_code = default_token_generator.make_token(user)
     user.save()
+    send_mail(
+        subject='YaMDB - Код подтверждения',
+                message=f'Код подтверждения - {confirmation_code}',
+                from_email='YaMDB@mail.com',
+                recipient_list=[user.email,],
+                fail_silently=False
+    )
     return Response(serializer.data, status=status.HTTP_200_OK)
-    #send_mail(
-    #    subject='YaMDB - Код подтверждения',
-    #            message=f'Код подтверждения - {user.confirmation_code}',
-    #            from_email='YaMDB@mail.com',
-    #            recipient_list=(user.email,),
-    #            fail_silently=False
-    #)
-    #return Response(serializer.data, status=status.HTTP_200_OK)
-
-#class APISignup(APIView):
-#    """Регистрация пользователя."""
-#    permission_classes = (permissions.AllowAny,)
-
-#    def post(self, request):
-#        serializer = SignUpSerializer(data=request.data)
-#        if serializer.is_valid(raise_exception=True):
-#            data = serializer.validated_data
-#            username = data.get('username')
-#            email = data.get('email')
-#            user, _ = User.objects.get_or_create(
-#                username=username,
-#                email=email
-#            )
-#            confirmation_code = default_token_generator.make_token(user)
-#            send_mail(
-#                subject='YaMDB - Код подтверждения',
-#                message=f'Код подтверждения - {confirmation_code}',
-#                from_email='YaMDB@mail.com',
-#                recipient_list=(user.email,),
-#               fail_silently=False
-#            )
-#            return Response(serializer.data, status=status.HTTP_200_OK)
-#        else:
-#            return Response(serializer.errors,
-#                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class APIGetToken(APIView):
@@ -162,23 +121,21 @@ class APIGetToken(APIView):
 
     def post(self, request):
         serializer = GetTokenSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        try:
-            user = User.objects.get(username=data['username'])
-        except User.DoesNotExist:
+        if not serializer.is_valid():
             return Response(
-                {'username': 'Пользователя не существует'},
-                status=status.HTTP_400_BAD_REQUEST
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
-        if data.get('confirmation_code') == user.confirmation_code:
+        username = serializer.validated_data.get('username')
+        confirmation_code = serializer.validated_data.get('confirmation_code')
+        user = get_object_or_404(User, username=username)
+        if user.confirmation_code == confirmation_code:
             token = RefreshToken.for_user(user).access_token
             return Response({'Токен': str(token)},
                             status=status.HTTP_200_OK)
         return Response(
             {'Токен': 'Неверный токен'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+            status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
