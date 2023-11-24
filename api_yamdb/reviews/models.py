@@ -9,11 +9,6 @@ USER = 'user'
 MODERATOR = 'moderator'
 ADMIN = 'admin'
 
-ROLE_CHOICES = [
-    (USER, USER),
-    (MODERATOR, MODERATOR),
-    (ADMIN, ADMIN),
-]
 
 TEXT_LOMIT = 30
 
@@ -21,12 +16,16 @@ TEXT_LOMIT = 30
 class User(AbstractUser):
     """Модель пользователя."""
 
+    ROLE_CHOICES = (
+        (USER, 'user'),
+        (MODERATOR, 'moderator'),
+        (ADMIN, 'admin'),
+    )
+
     username = models.CharField(
         max_length=150,
         verbose_name='имя пользователя',
-        unique=True,
-        blank=False,
-        null=False
+        unique=True
     )
     email = models.EmailField(
         max_length=254,
@@ -39,8 +38,7 @@ class User(AbstractUser):
         max_length=20,
         verbose_name='роль',
         choices=ROLE_CHOICES,
-        default=USER,
-        blank=True
+        default=USER
     )
     bio = models.CharField(
         max_length=254,
@@ -63,21 +61,19 @@ class User(AbstractUser):
         blank=True
     )
 
-    @property
-    def is_user(self):
-        return self.role == USER
-
-    @property
-    def is_moderator(self):
-        return self.role == self.is_staff or self.role == MODERATOR
-
-    @property
-    def is_admin(self):
-        return self.role == self.is_superuser or self.role == ADMIN
-
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+    
+    @property
+    def is_moderator(self):
+        return (self.role == MODERATOR
+                or self.is_staff)
+
+    @property
+    def is_admin(self):
+        return (self.role == ADMIN
+                or self.is_superuser)
 
     def __str__(self):
         return self.username

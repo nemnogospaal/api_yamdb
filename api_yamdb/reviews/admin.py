@@ -25,7 +25,7 @@ class ReviewAdmin(ImportExportModelAdmin):
     list_display = ('text', 'author', 'score')
 
 
-@admin.register(User)
+
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
@@ -41,6 +41,8 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ('role',)
 
     resource_classes = [ReviewResource]
+
+admin.site.register(User, UserAdmin)
 
 # класс обработки данных
 class CategoryResource(resources.ModelResource):

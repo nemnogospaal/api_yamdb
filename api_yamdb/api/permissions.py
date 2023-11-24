@@ -30,9 +30,7 @@ class IsAdminOrReading(permissions.BasePermission):
 
 
 class IsAdmin(permissions.BasePermission):
-    '''Ограничения прав доступа к модели User.'''
+    '''Ограничения прав доступа к работе с пользователями.'''
 
     def has_permission(self, request, view):
-        return (
-            request.user.is_authenticated and request.user.is_admin
-        )
+        return request.user.is_superuser or request.user.is_admin

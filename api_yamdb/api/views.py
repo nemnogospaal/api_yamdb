@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -71,7 +72,8 @@ class CommentViewSet(ModelViewSet):
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':
@@ -86,8 +88,40 @@ class UserViewSet(ModelViewSet):
     """Вьюсет для пользователя."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated,
-                          IsAdmin,)
+    permission_classes = (IsAuthenticated, IsAdmin)
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend)
+    search_fields = ['username',]
+    lookup_fields = 'username'
+    http_method_names = ('get', 'post', 'patch', 'delete')
+
+    def perform_create(self, serializer):
+        serializer.save()
+        user = User.objects.get(username=self.request.data.get('username'))
+        confirmation_code = default_token_generator.make_token(user)
+        serializer.save(
+            confirmation_code=confirmation_code
+        )
+
+
+    @action(
+        detail=False,
+        methods=('get', 'patch'),
+        permission_classes=(IsAuthenticated,),
+        url_path='me'
+    )
+    def user_info(self, request):
+        serializer = UserPatchSerializer(
+            request.user,
+            partial=True,
+            data=request.data
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+        if request.method == 'PATCH':
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -128,7 +162,7 @@ class APIGetToken(APIView):
         username = serializer.validated_data.get('username')
         confirmation_code = serializer.validated_data.get('confirmation_code')
         user = get_object_or_404(User, username=username)
-        if user.confirmation_code == confirmation_code:
+        if default_token_generator.check_token(user, confirmation_code):
             token = RefreshToken.for_user(user).access_token
             return Response({'Токен': str(token)},
                             status=status.HTTP_200_OK)
