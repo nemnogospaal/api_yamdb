@@ -60,24 +60,14 @@ class CommentViewSet(ModelViewSet):
     def get_queryset(self):
         review = get_object_or_404(
             Review,
-            id=self.kwargs.get('review_id'),
-            title__id=self.kwargs.get('title_id'))
+            id=self.kwargs.get('review_id'))
         return review.comments.all()
 
     def perform_create(self, serializer):
         review = get_object_or_404(
             Review,
-            id=self.kwargs.get('review_id'),
-            title__id=self.kwargs.get('title_id'))
-        serializer.is_valid(raise_exception=True)
-
-        try:
-            serializer.save(
-                author=self.request.user,
-                review=review
-            )
-        except ValidationError as e:
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            id=self.kwargs.get('review_id'))
+        serializer.save(author=self.request.user, review=review)
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':

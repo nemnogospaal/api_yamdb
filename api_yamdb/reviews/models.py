@@ -262,7 +262,6 @@ class Comment(models.Model):
     text = models.TextField(
         max_length=100,
         verbose_name='Текст комментария',
-        blank=True
     )
     author = models.ForeignKey(
         User,
