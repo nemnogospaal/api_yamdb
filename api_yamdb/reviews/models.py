@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from api.validators import (USERNAME_ME_REGEX, USERNAME_SYMBOLS_REGEX,
+                            username_me_validator, username_validator)
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import (MaxValueValidator, MinValueValidator,
                                     RegexValidator)
@@ -17,26 +19,27 @@ class User(AbstractUser):
     """Модель пользователя."""
 
     ROLE_CHOICES = (
-        (USER, 'user'),
-        (MODERATOR, 'moderator'),
-        (ADMIN, 'admin'),
+        (USER, USER),
+        (MODERATOR, MODERATOR),
+        (ADMIN, ADMIN),
     )
 
     username = models.CharField(
         max_length=150,
         verbose_name='имя пользователя',
+        validators=(USERNAME_ME_REGEX, USERNAME_SYMBOLS_REGEX,
+                    username_me_validator, username_validator),
         unique=True
     )
     email = models.EmailField(
         max_length=254,
         verbose_name='email',
-        unique=True,
-        blank=False,
-        null=False
+        unique=True
     )
     role = models.CharField(
         max_length=20,
         verbose_name='роль',
+        blank=True,
         choices=ROLE_CHOICES,
         default=USER
     )
@@ -61,10 +64,6 @@ class User(AbstractUser):
         blank=True
     )
 
-    class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
-    
     @property
     def is_moderator(self):
         return (self.role == MODERATOR
@@ -73,7 +72,12 @@ class User(AbstractUser):
     @property
     def is_admin(self):
         return (self.role == ADMIN
-                or self.is_superuser)
+                or self.is_superuser or self.is_staff)
+    
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+    
 
     def __str__(self):
         return self.username

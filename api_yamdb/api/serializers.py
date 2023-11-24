@@ -1,11 +1,12 @@
 import re
 
+from api.validators import USERNAME_ME_REGEX, USERNAME_SYMBOLS_REGEX
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title, User
-from api.validators import username_me_validator, username_validator
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор модели пользователей."""
 
     class Meta:
         model = User
@@ -21,44 +22,28 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
 
-class SignUpSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=254,
-                                   required=True)
-    username = serializers.CharField(max_length=150,
-                                     required=True,
-                                     validators=[username_validator,
-                                                 username_me_validator])
+class SignUpSerializer(serializers.ModelSerializer):
+    """Сериализатор регистрации."""
 
-    def validate(self, data):
-        username = data.get('username')
-        if not User.objects.filter(
-            username=(data.get('username')), email=(data.get('email'))
-        ).exists():
-            if User.objects.filter(username=(data.get('username'))):
-                raise serializers.ValidationError('Данный username уже занят')
-            if User.objects.filter(email=data.get('email')):
-                raise serializers.ValidationError('Данный email уже занят')
-            if re.search(r'^[\w.@+-]+\Z', str(username)) is None:
-                raise serializers.ValidationError(
-                    'Недопустимые символы в логине')
-        return data
+    class Meta:
+        model = User
+        fields = ('email', 'username')
 
 
 class GetTokenSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150,
-                                     required=True,
-                                     validators=[username_validator,
-                                                 username_me_validator])
-    confirmation_code = serializers.CharField(required=True,
-                                              max_length=254)
+    """Сериализатор получения токена."""
+    username = serializers.CharField(required=True,
+                                     validators=[USERNAME_ME_REGEX,
+                                                 USERNAME_SYMBOLS_REGEX])
+    confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code')
 
 
 class UserPatchSerializer(serializers.ModelSerializer):
-    username = serializers.RegexField(
-        max_length=150,
-        regex=r'^[\w.@+-]+\Z',
-        required=True
-    )
+    """Сериализатор пользователя."""
 
     class Meta:
         model = User

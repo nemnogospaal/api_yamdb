@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from reviews.models import Comment, Review, User, Category, Title, GenreTitle, Genre
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
-
+from reviews.models import (Category, Comment, Genre, GenreTitle, Review,
+                            Title, User)
 
 #class CommentResource(resources.ModelResource):
 
