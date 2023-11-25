@@ -60,10 +60,14 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(
         read_only=True
     )
+    review = serializers.SlugRelatedField(
+        slug_field='text',
+        read_only=True
+    )
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        fields = ('id', 'text', 'author', 'score', 'pub_date', 'review')
 
     def validate_score(self, value):
         if 0 > value > 10:
@@ -89,14 +93,10 @@ class CommentSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(
         read_only=True
     )
-    review = serializers.SlugRelatedField(
-        slug_field='text',
-        read_only=True
-    )
 
     class Meta:
         model = Comment
-        fields = ('id', 'text', 'author', 'pub_date', 'review')
+        fields = ('id', 'text', 'author', 'pub_date',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -127,16 +127,20 @@ class TitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'description', 'genre', 'category', 'rating'
         )
 
 
 class GetOnlyTitleSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
+    rating = serializers.IntegerField(
+        source='reviews__score__avg',
+        read_only=True
+    )
 
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )

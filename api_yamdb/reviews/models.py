@@ -73,11 +73,10 @@ class User(AbstractUser):
     def is_admin(self):
         return (self.role == ADMIN
                 or self.is_superuser or self.is_staff)
-    
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-    
 
     def __str__(self):
         return self.username
@@ -177,7 +176,11 @@ class Title(models.Model):
         verbose_name='категория',
         null=True
     )
-
+    rating = models.IntegerField(
+        'Рейтинг',
+        null=True,
+        default=None
+    )
 
     class Meta:
         verbose_name = 'Произведение'
@@ -262,8 +265,7 @@ class Comment(models.Model):
 
     text = models.TextField(
         max_length=100,
-        verbose_name='Текст комментария',
-        blank=True
+        verbose_name='Текст комментария'
     )
     author = models.ForeignKey(
         User,

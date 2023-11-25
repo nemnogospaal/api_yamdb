@@ -28,18 +28,17 @@ class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (IsAdminModAuthorOrReading,)
 
-    def get_title(self):
-        title_id = self.kwargs.get('title_id')
-        return get_object_or_404(Title, pk=title_id)
-
     def get_queryset(self):
-        return self.get_title().reviews.all()
+        title = get_object_or_404(
+            Title,
+            id=self.kwargs.get('title_id'))
+        return title.reviews.all()
 
     def perform_create(self, serializer):
-        serializer.save(
-            author=self.request.user,
-            title=self.get_title()
-        )
+        title = get_object_or_404(
+            Title,
+            id=self.kwargs.get('title_id'))
+        serializer.save(author=self.request.user, title=title)
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':
@@ -156,6 +155,7 @@ class APIGetToken(APIView):
             {'Код подтверждения': 'Неправильный код подтверждения'},
             status=status.HTTP_400_BAD_REQUEST)
 
+
 class CategoryViewSet(CreateListDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -178,7 +178,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.request.method == 'GET':
             return GetOnlyTitleSerializer
         return TitleSerializer
-    
+
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':
             return Response(
