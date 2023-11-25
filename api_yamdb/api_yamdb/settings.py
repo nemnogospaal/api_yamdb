@@ -1,9 +1,6 @@
 import os
-import sys
 from datetime import timedelta
 from pathlib import Path
-
-from django.core.validators import RegexValidator
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -108,7 +105,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 
-STATIC_ROOT = 'staticfiles/' # Here
+STATIC_ROOT = 'staticfiles/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static/'
 ]
@@ -138,4 +135,3 @@ SIMPLE_JWT = {
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
-
