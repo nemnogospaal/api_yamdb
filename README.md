@@ -5,9 +5,9 @@
 Список категорий (Category) может быть расширен (например, можно добавить категорию «Изобразительное искусство» или «Ювелирка»).
 
 Команда разработки:
-- :white_check_mark: [nemnogospaal (в роли Python-разработчика Тимлид - разработчик 1)](https://github.com/nemnogospaal)
-- :white_check_mark: [absurdnik1 (в роли Python-разработчика - разработчик 2)](https://github.com/absurdnik1)
-- :white_check_mark: [Tikhonov-prog (в роли Python-разработчика - разработчик 3)](https://github.com/Tikhonov-prog)
+- [nemnogospaal (в роли Python-разработчика Тимлид - разработчик 1)](https://github.com/nemnogospaal)
+- [absurdnik1 (в роли Python-разработчика - разработчик 2)](https://github.com/absurdnik1)
+- [Tikhonov-prog (в роли Python-разработчика - разработчик 3)](https://github.com/Tikhonov-prog)
 
 Сами произведения в YaMDb не хранятся, здесь нельзя посмотреть фильм или послушать музыку.
 
