@@ -1,11 +1,12 @@
 from datetime import datetime
 
-from api.validators import (USERNAME_ME_REGEX, USERNAME_SYMBOLS_REGEX,
-                            username_me_validator, username_validator)
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import (MaxValueValidator, MinValueValidator,
                                     RegexValidator)
 from django.db import models
+
+from api.validators import (USERNAME_ME_REGEX, USERNAME_SYMBOLS_REGEX,
+                            username_me_validator, username_validator)
 
 USER = 'user'
 MODERATOR = 'moderator'

@@ -1,7 +1,8 @@
 import re
 
-from api.validators import USERNAME_ME_REGEX, USERNAME_SYMBOLS_REGEX
 from rest_framework import serializers
+
+from api.validators import USERNAME_ME_REGEX, USERNAME_SYMBOLS_REGEX
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 

@@ -1,6 +1,6 @@
 from rest_framework import filters, mixins, viewsets
 
-from .permissions import IsAdminOrReading
+from api.permissions import IsAdminOrReading
 
 
 class CreateListDestroyViewSet(mixins.CreateModelMixin,
