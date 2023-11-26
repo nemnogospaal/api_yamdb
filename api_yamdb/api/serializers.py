@@ -32,9 +32,10 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 class GetTokenSerializer(serializers.Serializer):
     """Сериализатор получения токена."""
-    username = serializers.CharField(required=True,
-                                     validators=[USERNAME_ME_REGEX,
-                                                 USERNAME_SYMBOLS_REGEX])
+
+    username = serializers.CharField(
+        required=True,
+        validators=[USERNAME_ME_REGEX, USERNAME_SYMBOLS_REGEX])
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:
@@ -76,6 +77,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Запрещает пользователям оставлять повторные отзывы."""
+
         if not self.context.get('request').method == 'POST':
             return data
         author = self.context.get('request').user
@@ -100,6 +102,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор модели категорий."""
 
     class Meta:
         model = Category
@@ -107,6 +110,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    """Сериализатор модели жанров."""
 
     class Meta:
         model = Genre
@@ -114,6 +118,8 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    """Сериализатор модели произведениий."""
+
     genre = serializers.SlugRelatedField(
         many=True,
         slug_field='slug',
@@ -132,6 +138,8 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class GetOnlyTitleSerializer(serializers.ModelSerializer):
+    """Сериализатор произведения."""
+
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
     rating = serializers.IntegerField(

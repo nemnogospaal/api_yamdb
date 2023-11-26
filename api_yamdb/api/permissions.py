@@ -2,7 +2,7 @@ from rest_framework import permissions
 
 
 class IsAdminModAuthorOrReading(permissions.BasePermission):
-    '''Ограничения прав доступа к моделям Review, Comment.'''
+    """Ограничения прав доступа к моделям Review, Comment."""
 
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS
@@ -18,7 +18,7 @@ class IsAdminModAuthorOrReading(permissions.BasePermission):
 
 
 class IsAdminOrReading(permissions.BasePermission):
-    '''Ограничения прав доступа к моделям Genre, Category, Title.'''
+    """Ограничения прав доступа к моделям Genre, Category, Title."""
 
     def has_permission(self, request, view):
         return (
@@ -30,7 +30,7 @@ class IsAdminOrReading(permissions.BasePermission):
 
 
 class IsAdmin(permissions.BasePermission):
-    '''Ограничения прав доступа к работе с пользователями.'''
+    """Ограничения прав доступа к работе с пользователями."""
 
     def has_permission(self, request, view):
         return request.user.is_superuser or request.user.is_admin

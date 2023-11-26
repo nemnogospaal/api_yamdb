@@ -69,9 +69,8 @@ class CommentViewSet(ModelViewSet):
                 review=self.get_review()
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
         if request.method == 'PUT':

@@ -7,8 +7,8 @@ class CreateListDestroyViewSet(mixins.CreateModelMixin,
                                mixins.ListModelMixin,
                                mixins.DestroyModelMixin,
                                viewsets.GenericViewSet):
-    '''Кастомный класс для моделей Category и Genre:
-    получение списка, создание и удаление элемента.'''
+    """Кастомный класс для моделей Category и Genre:
+    получение списка, создание и удаление элемента."""
 
     permission_classes = (IsAdminOrReading,)
     filter_backends = (filters.SearchFilter,)

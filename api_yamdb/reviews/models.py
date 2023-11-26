@@ -74,12 +74,12 @@ class User(AbstractUser):
         return (self.role == ADMIN
                 or self.is_superuser or self.is_staff)
 
+    def __str__(self):
+        return self.username
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-
-    def __str__(self):
-        return self.username
 
 
 class Category(models.Model):
@@ -100,13 +100,13 @@ class Category(models.Model):
         )]
     )
 
+    def __str__(self):
+        return self.name[:TEXT_LOMIT]
+
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
         ordering = ('name',)
-
-    def __str__(self):
-        return self.name[:TEXT_LOMIT]
 
 
 class Genre(models.Model):
@@ -127,13 +127,13 @@ class Genre(models.Model):
         )]
     )
 
+    def __str__(self):
+        return self.name[:TEXT_LOMIT]
+
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
         ordering = ('name',)
-
-    def __str__(self):
-        return self.name[:TEXT_LOMIT]
 
 
 class Title(models.Model):
@@ -182,13 +182,13 @@ class Title(models.Model):
         default=None
     )
 
+    def __str__(self):
+        return self.name[:TEXT_LOMIT]
+
     class Meta:
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
         ordering = ('-year', 'name')
-
-    def __str__(self):
-        return self.name[:TEXT_LOMIT]
 
 
 class GenreTitle(models.Model):
@@ -205,13 +205,13 @@ class GenreTitle(models.Model):
         verbose_name='произведение'
     )
 
+    def __str__(self):
+        return f'{self.title} принадлежит жанру/ам {self.genre}'
+
     class Meta:
         verbose_name = 'Соответствие жанра и произведения'
         verbose_name_plural = 'Таблица соответствия жанров и произведений'
         ordering = ('id',)
-
-    def __str__(self):
-        return f'{self.title} принадлежит жанру/ам {self.genre}'
 
 
 class Review(models.Model):

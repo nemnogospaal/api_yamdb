@@ -35,14 +35,12 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 
 
-# класс обработки данных
 class CategoryResource(resources.ModelResource):
 
     class Meta:
         model = Category
 
 
-# вывод данных на странице
 @admin.register(Category)
 class CategoryAdmin(ImportExportModelAdmin):
     resource_classes = [CategoryResource]
